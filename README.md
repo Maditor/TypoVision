@@ -20,7 +20,7 @@ Extension CEP cho Adobe Photoshop giúp **chụp vùng chọn (selection) → OC
 | Thành phần | Yêu cầu |
 |---|---|
 | Adobe Photoshop | Bản có hỗ trợ CEP (khuyến nghị CC 2020 trở lên) |
-| Node.js | Đã cài trên máy (dùng để chạy server nền `server/server.js`) |
+| Node.js | Bắt buộc cài để chạy Server |
 | Gemini API Key | Lấy miễn phí tại [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
 | Hệ điều hành | Windows |
 
