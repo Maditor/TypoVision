@@ -1,3 +1,6 @@
+# TẢI TRONG PHẦN RELEASE DO NHIỀU FILE QUÁ KHÔNG ĐĂNG LÊN SOURCE ĐƯỢC
+
+
 # TypoVision
 
 Extension CEP cho Adobe Photoshop giúp **chụp vùng chọn (selection) → OCR → dịch** ngay trong panel, sử dụng Google Gemini API.
