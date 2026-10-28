@@ -69,7 +69,7 @@ Copy cả thư mục `extension/` vào đó, đổi tên thành ví dụ `PSOcrT
 
 ### d. Mở Photoshop
 
-Vào menu **Window → Extensions (hoặc Plugins) → OCR Translate**.
+Vào menu **Window → Extensions (hoặc Plugins) → TypoVision**.
 
 ---
 
