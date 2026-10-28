@@ -1,121 +1,118 @@
-# TẢI TRONG PHẦN RELEASE DO NHIỀU FILE QUÁ KHÔNG ĐĂNG LÊN SOURCE ĐƯỢC
+# PS OCR Translate — CEP Extension cho Photoshop (CC2018 → mới nhất)
 
+Bộ gồm 2 phần:
 
-# TypoVision
+1. **`extension/`** — CEP panel chạy trong Photoshop. Cho phép chọn 1 vùng trên ảnh,
+   xuất thành PNG tạm, gửi OCR, rồi dịch.
+2. **`server/`** — Node.js server đứng giữa, gọi:
+   - **OCR.space** để lấy chữ từ ảnh (bạn chọn ngôn ngữ OCR).
+   - **Gemini API** để dịch (Gemini tự nhận diện ngôn ngữ nguồn, bạn chỉ chọn ngôn ngữ đích).
 
-Extension CEP cho Adobe Photoshop giúp **chụp vùng chọn (selection) → OCR → dịch** ngay trong panel, sử dụng Google Gemini API.
-
----
-
-## 1. Tính năng
-
-- Chụp ảnh trực tiếp từ vùng chọn hiện tại trong Photoshop.
-- Nhận diện văn bản (OCR) trong ảnh bằng Gemini.
-- Dịch văn bản sang ngôn ngữ mong muốn, giọng văn tự nhiên.
-- Cho phép sửa lại văn bản OCR và tự động dịch lại.
-- Copy nhanh kết quả OCR / bản dịch vào clipboard.
-- Bật/tắt server nền (Node.js) ngay trong panel.
+Panel **không** gọi trực tiếp OCR.space/Gemini (tránh lộ API key trong code phía client),
+mà gọi qua `server.js` chạy local.
 
 ---
 
-## 2. Yêu cầu hệ thống
+## 1. Cài server.js
 
-| Thành phần | Yêu cầu |
-|---|---|
-| Adobe Photoshop | Bản có hỗ trợ CEP (khuyến nghị CC 2020 trở lên) |
-| Node.js | Bắt buộc cài để chạy Server |
-| Gemini API Key | Lấy miễn phí tại [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
-| Hệ điều hành | Windows |
-
----
-
-## 3. Cài đặt
-
-1. Cài **Node.js** nếu máy chưa có (đây là thứ duy nhất cần cài thêm ngoài Photoshop).
-2. Giải nén / clone toàn bộ project (thư mục gốc chứa `client`, `CSXS`, `host`, `icons`, `server`).
-3. Chạy file **`install-win.bat`** (đặt cùng cấp thư mục gốc) để:
-   - Copy extension vào `%APPDATA%\Adobe\CEP\extensions\TypoVision`
-   - Bật `PlayerDebugMode` trong Registry (cho phép Photoshop load extension chưa ký số)
-4. Khởi động lại Photoshop.
-5. Mở panel qua menu **Window > Extensions > TypoVision**.
-
-> Thư mục `server/node_modules` đã có sẵn trong project, **không cần chạy `npm install`**.
-
----
-
-## 4. Cấu hình lần đầu
-
-1. Trong panel, bấm biểu tượng **⚙ Settings**.
-2. Nhập:
-   - **API Key**: Gemini API key của bạn.
-   - **Model**: mặc định `gemini-2.0-flash-lite` (có thể đổi sang model Gemini khác nếu muốn).
-   - **Server URL**: mặc định `http://localhost:3000`, chỉ đổi nếu bạn chạy server ở cổng/địa chỉ khác.
-3. Bấm **Save**.
-
-> Cấu hình được lưu trong `localStorage` của panel, không cần nhập lại mỗi lần mở.
-
----
-
-## 5. Khởi động Server
-
-Panel gọi API qua server Node chạy nền (`server/server.js`). Có 2 cách chạy:
-
-**Cách 1 – Trong panel:**
-Bấm nút **Start** trong khung Settings để khởi động server, **Stop** để tắt.
-
-**Cách 2 – Thủ công:**
 ```bash
 cd server
-node server.js
-```
-hoặc chạy `start_server.bat` / `stop_server.bat` có sẵn trong thư mục `server`.
-
-Khi server chạy thành công, chấm trạng thái ở góc trên panel sẽ chuyển sang **xanh (Server online)**.
-
----
-
-## 6. Cách sử dụng
-
-1. Trong Photoshop, dùng công cụ chọn vùng (Marquee, Lasso...) để khoanh vùng chứa chữ cần dịch.
-2. Trong panel, chọn:
-   - **OCR**: ngôn ngữ gốc của chữ trong ảnh (hoặc để `Auto`).
-   - **Translate**: ngôn ngữ muốn dịch sang.
-3. Bấm **Capture Selection** → ảnh xem trước sẽ hiện ra.
-4. Bấm **Run** → panel sẽ:
-   - Hiển thị văn bản OCR được.
-   - Hiển thị bản dịch tương ứng.
-5. Có thể sửa trực tiếp ô **OCR** — panel sẽ tự động dịch lại sau ~1.2 giây.
-6. Dùng nút **Copy** ở mỗi ô để sao chép kết quả.
-7. Bấm **✕** trên ảnh xem trước để xoá và chụp lại vùng khác.
-
----
-
-## 7. Xử lý sự cố
-
-| Vấn đề | Nguyên nhân / cách khắc phục |
-|---|---|
-| Panel không mở được / không thấy trong menu Extensions | Kiểm tra đã chạy `install-win.bat` và khởi động lại Photoshop chưa. Kiểm tra registry `PlayerDebugMode` đã bật. |
-| "Server offline" | Server Node chưa chạy — bấm **Start** trong Settings, hoặc chạy `node server.js` thủ công. |
-| "CSInterface not available" | Đang mở panel ngoài môi trường Photoshop (ví dụ mở trực tiếp `index.html` bằng trình duyệt) — cần chạy trong Photoshop. |
-| "API key not set" | Chưa nhập Gemini API Key trong phần Settings. |
-| "Gemini did not return valid JSON" | Model trả kết quả không đúng định dạng — thử đổi model hoặc chụp lại vùng ảnh rõ hơn. |
-| Lỗi khi export ảnh selection | Đảm bảo đã tạo vùng chọn (selection) hợp lệ trong Photoshop trước khi bấm Capture. |
-
----
-
-## 8. Cấu trúc thư mục chính
-
-```
-├── client/          Giao diện panel (HTML/CSS/JS chạy trong CEP)
-├── CSXS/manifest.xml Khai báo extension cho Adobe
-├── host/index.jsx    ExtendScript: xuất ảnh selection, start/stop server
-├── icons/             Icon extension
-└── server/            Server Node.js (Express) gọi Gemini API
+npm install
+cp .env.example .env
 ```
 
+Mở `.env`, điền:
+- `OCR_SPACE_API_KEY` — lấy free tại https://ocr.space/ocrapi
+- `GEMINI_API_KEY` — lấy tại https://aistudio.google.com/apikey
+- `GEMINI_MODEL` — để mặc định `gemini-flash-latest`, hoặc đổi sang model cụ thể (ví dụ `gemini-2.5-flash`) nếu muốn cố định version.
+
+Chạy server:
+
+```bash
+npm start
+```
+
+Server chạy ở `http://localhost:3000`. Giữ cửa sổ terminal này mở khi dùng Photoshop.
+
+> Có thể test nhanh server bằng `curl http://localhost:3000/api/health`.
+
 ---
 
-## 9. Bảo mật
+## 2. Cài extension vào Photoshop
 
-- API Key được lưu cục bộ trên máy bạn (localStorage của panel / `config.json` của server), **không được gửi đi đâu khác** ngoài request gọi trực tiếp tới Gemini API của Google.
-- Không chia sẻ file `config.json` hoặc API Key của bạn cho người khác.
+### a. Tải `CSInterface.js`
+
+File này do Adobe phát hành/maintain (không kèm sẵn ở đây). Lấy bản mới nhất tại repo chính thức:
+
+`https://github.com/Adobe-CEP/CEP-Resources` → vào thư mục `CEP_<version>/` → copy `CSInterface.js`
+
+Đặt vào: `extension/client/libs/CSInterface.js`
+
+### b. Bật chế độ debug cho CEP (để load extension chưa ký)
+
+- **Windows**: mở Registry Editor, tại `HKEY_CURRENT_USER\Software\Adobe\CSXS.<version>`
+  (ví dụ `CSXS.9`, `CSXS.11`...) tạo string value `PlayerDebugMode` = `1`.
+- **macOS**: chạy trong Terminal:
+  ```bash
+  defaults write com.adobe.CSXS.<version> PlayerDebugMode 1
+  ```
+Cần làm cho **tất cả version CSXS** mà Photoshop bạn dùng hỗ trợ (mỗi bản Photoshop có thể map tới CSXS version khác nhau — không chắc thì set cho vài version liền kề: 9, 10, 11...).
+
+### c. Copy thư mục extension vào đúng vị trí
+
+- **Windows**: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\`
+  (hoặc `%APPDATA%\Adobe\CEP\extensions\` cho user-level)
+- **macOS**: `/Library/Application Support/Adobe/CEP/extensions/`
+  (hoặc `~/Library/Application Support/Adobe/CEP/extensions/`)
+
+Copy cả thư mục `extension/` vào đó, đổi tên thành ví dụ `PSOcrTranslate` (thư mục này phải chứa trực tiếp `CSXS/`, `client/`, `host/`).
+
+### d. Mở Photoshop
+
+Vào menu **Window → Extensions (hoặc Plugins) → OCR Translate**.
+
+---
+
+## 3. Cách dùng
+
+1. Mở `server.js` (terminal: `npm start` trong thư mục `server/`).
+2. Trong Photoshop, dùng công cụ chọn vùng (Marquee, Lasso...) khoanh vùng chữ cần dịch.
+   Nếu không chọn gì, extension sẽ xuất toàn bộ canvas.
+3. Trong panel:
+   - Chọn **Ngôn ngữ OCR** (ngôn ngữ chữ trong ảnh) — hoặc để **"Tự nhận diện"**.
+   - Chọn **Dịch sang** (ngôn ngữ đích) — Gemini sẽ tự nhận diện ngôn ngữ nguồn.
+   - Bấm **📷 Chụp vùng chọn & Dịch**.
+4. Văn bản OCR và bản dịch hiện ra trong 2 ô textarea, có thể copy ra dùng.
+
+---
+
+## Cấu trúc project
+
+```
+extension/
+  CSXS/manifest.xml      <- khai báo extension, hỗ trợ Photoshop 19.0 (2018) đến mới nhất
+  client/
+    index.html           <- UI panel
+    style.css
+    main.js               <- logic: gọi ExtendScript, gọi server OCR + dịch
+    libs/CSInterface.js   <- (bạn tự thêm, xem mục 2a)
+  host/
+    index.jsx             <- ExtendScript: xuất vùng chọn ra PNG tạm
+server/
+  server.js               <- Express server: /api/ocr, /api/translate
+  package.json
+  .env.example
+```
+
+## Ghi chú / mở rộng thêm
+
+- **Bảo mật**: hiện server cho `cors origin: "*"` để panel CEP (chạy từ `file://`) gọi được.
+  Nếu deploy server ra ngoài máy local, nên giới hạn lại và thêm xác thực (API key riêng giữa
+  panel ↔ server).
+- **OCR Engine**: server tự chọn Engine 1 cho tiếng Trung/Nhật/Hàn, Engine 2 cho còn lại/auto.
+  Có thể chỉnh logic này trong `server.js` nếu kết quả OCR không tốt.
+- **CEP vs UXP**: Adobe đang dần chuyển các app sang UXP. CEP vẫn chạy được trên Photoshop hiện tại,
+  nhưng nếu sau này Adobe ngừng hỗ trợ CEP cho Photoshop, sẽ cần viết lại phần `extension/` sang UXP
+  (phần `server/` giữ nguyên không đổi).
+- **Giới hạn ảnh**: OCR.space free tier giới hạn kích thước file & số request/phút — nếu vùng chọn
+  quá lớn hoặc dùng nhiều, có thể cần nâng cấp gói hoặc giảm kích thước ảnh trước khi gửi.
