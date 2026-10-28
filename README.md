@@ -1,4 +1,4 @@
-# PS OCR Translate — CEP Extension cho Photoshop (CC2018 → mới nhất)
+# TypoVision — CEP Extension cho Photoshop (CC2018 → mới nhất)
 
 Bộ gồm 2 phần:
 
